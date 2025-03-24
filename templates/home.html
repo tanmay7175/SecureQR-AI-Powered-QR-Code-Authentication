@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SecureQR: AI-Powered QR Code Authentication</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>SecureQR: AI-Powered QR Code Authentication</h1>
+        <p>Secure & Reliable QR Code Authentication using CNN.</p>
+    </header>
+
+    <div class="container">
+        <!-- How It Works Section -->
+        <div class="info-section">
+            <h2>🛠 How It Works</h2>
+            <p>
+                Our AI-driven system, powered by <strong>Convolutional Neural Networks (CNNs)</strong>, 
+                analyzes QR codes to detect authenticity.  
+                Simply upload an image, and our model will determine whether it is 
+                <strong>Original</strong> or <strong>Counterfeit</strong>.
+            </p>
+        </div>
+
+        <!-- CNN Classification Info Section -->
+        <div class="cnn-architecture">
+            <h2>How CNN Classifies QR Codes</h2>
+            <p>
+                A Convolutional Neural Network (CNN) classifies QR codes by analyzing 
+                pixel patterns and distortions in the image.  
+                It applies convolutional layers to extract key features, such as 
+                <strong>blur, noise, and structural integrity</strong>,  
+                distinguishing <strong>original QR codes from counterfeit ones</strong> 
+                based on learned patterns.
+            </p>
+        </div>
+
+        <!-- File Upload Section -->
+        <div class="upload-section">
+            <h2>Upload QR Code & Verify</h2>
+            <form action="/" method="post" enctype="multipart/form-data">
+                <label for="file" class="custom-file-upload">📁 Choose File</label>
+                <input type="file" name="file" id="file" accept="image/*" hidden>
+                <span id="file-name">No file chosen</span>
+                <button type="submit">Verify</button>
+            </form>
+        </div>
+
+        <!-- Display Prediction Result -->
+        {% if result %}
+        <div class="result-section">
+            <h2>Prediction Result:</h2>
+            <p class="{{ 'valid' if 'Original' in result else 'invalid' }}">
+                {{ result }}
+            </p>
+            <img src="{{ url_for('static', filename='uploads/' + filename) }}" alt="Uploaded QR Code" class="qr-image">
+        </div>
+        {% endif %}
+    </div>
+
+    <footer>
+        <p>Powered by AI & CNN | Secure QR Verification</p>
+    </footer>
+
+    <!-- JavaScript to Show Selected File Name -->
+    <script>
+        document.getElementById("file").addEventListener("change", function () {
+            const fileName = this.files.length > 0 ? this.files[0].name : "No file chosen";
+            document.getElementById("file-name").textContent = fileName;
+        });
+    </script>
+</body>
+</html>
