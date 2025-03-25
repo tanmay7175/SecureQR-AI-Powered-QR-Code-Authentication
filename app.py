@@ -62,7 +62,3 @@ def index():
             return render_template("home.html", result=result, filename=filename)
 
     return render_template("home.html", result=result)
-
-# Run Flask App
-if __name__ == "__main__":
-    app.run(debug=True)
