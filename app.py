@@ -4,15 +4,24 @@ import cv2
 import tensorflow as tf
 from tensorflow.keras.models import load_model
 import os
-import uuid  # To generate unique filenames
-from werkzeug.utils import secure_filename  # For safe file handling
+import uuid  # Generate unique filenames
+from werkzeug.utils import secure_filename  # Secure file handling
+
+# Disable GPU to avoid unnecessary TensorFlow CUDA warnings
+os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
 # Initialize Flask App
 app = Flask(__name__)
 
-# Load trained CNN model
+# Load trained CNN model with error handling
 MODEL_PATH = "cnn_qr_model.h5"
-model = load_model(MODEL_PATH)
+model = None
+try:
+    model = load_model(MODEL_PATH)
+    model.compile(optimizer="adam", loss="binary_crossentropy", metrics=["accuracy"])  # Ensure model is compiled
+    print("✅ Model loaded successfully!")
+except Exception as e:
+    print(f"❌ Error loading model: {e}")
 
 # Allowed file extensions
 ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg"}
@@ -43,6 +52,9 @@ def index():
     filename = None
 
     if request.method == "POST":
+        if "file" not in request.files:
+            return render_template("home.html", result="⚠️ No file uploaded!")
+
         file = request.files["file"]
         if file and allowed_file(file.filename):
             # Generate a unique filename to prevent overwriting
@@ -55,6 +67,8 @@ def index():
             img = preprocess_image(file_path)
             if img is None:
                 result = "⚠️ Invalid Image Format"
+            elif model is None:
+                result = "❌ Model not loaded. Please check server logs."
             else:
                 prediction = model.predict(img)[0][0]  # Model Prediction
                 result = "✅ Original QR Code" if prediction < 0.5 else "❌ Counterfeit QR Code"
